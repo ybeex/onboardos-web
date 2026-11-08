@@ -1,0 +1,351 @@
+@import 'tailwindcss';
+
+/**
+ * DESIGN TOKEN ARCHITECTURE
+ * =========================
+ * Two layers, on purpose:
+ *
+ * 1. RAW PALETTE (--palette-*) — the actual color values, defined once,
+ *    OKLCH throughout for perceptually-even lightness steps (matches
+ *    Tailwind v4's own internal palette approach). Never referenced
+ *    directly by components.
+ *
+ * 2. SEMANTIC TOKENS (--background, --primary, --success, etc.) —
+ *    what components actually use, via Tailwind utilities like
+ *    `bg-background` or `text-primary`. Defined in `:root` for light
+ *    mode and redefined in `.dark` for dark mode, each pointing at
+ *    different palette stops.
+ *
+ * The `@theme inline` block below maps semantic token names to Tailwind
+ * utility classes WITHOUT baking in a static value — `inline` keeps
+ * them as live `var()` references, which is what lets next-themes'
+ * `.dark` class swap actually change every utility at runtime instead
+ * of only at build time. This is the mechanism `eslint.config.mjs`'s
+ * no-hardcoded-hex rule exists to protect: every color in this app
+ * traces back to exactly one of the two layers above.
+ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+
+  /* Deliberately NOT redefined in .dark below — see that section's
+     comment. */
+  --color-inverse: var(--inverse);
+  --color-inverse-foreground: var(--inverse-foreground);
+  --color-inverse-muted-foreground: var(--inverse-muted-foreground);
+  --color-inverse-border: var(--inverse-border);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-geist-sans), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-sm: var(--radius-sm-value);
+  --radius-md: var(--radius-md-value);
+  --radius-lg: var(--radius-lg-value);
+  --radius-xl: var(--radius-xl-value);
+
+  --shadow-soft-sm: var(--shadow-soft-sm-value);
+  --shadow-soft-md: var(--shadow-soft-md-value);
+  --shadow-soft-lg: var(--shadow-soft-lg-value);
+
+  --ease-soft: var(--ease-soft-value);
+}
+
+/* ── Layer 1: raw palette — OKLCH, never referenced directly by components ── */
+:root {
+  --palette-white: oklch(1 0 0);
+  --palette-black: oklch(0.13 0.01 265);
+
+  --palette-navy-50: oklch(0.97 0.005 265);
+  --palette-navy-100: oklch(0.93 0.01 265);
+  --palette-navy-200: oklch(0.85 0.02 265);
+  --palette-navy-300: oklch(0.72 0.03 265);
+  --palette-navy-400: oklch(0.55 0.04 265);
+  --palette-navy-500: oklch(0.42 0.05 265);
+  --palette-navy-600: oklch(0.33 0.05 265);
+  --palette-navy-700: oklch(0.26 0.045 265);
+  --palette-navy-800: oklch(0.2 0.04 265);
+  --palette-navy-900: oklch(0.15 0.035 265);
+  --palette-navy-950: oklch(0.11 0.025 265);
+
+  --palette-orange-50: oklch(0.97 0.02 55);
+  --palette-orange-100: oklch(0.93 0.05 55);
+  --palette-orange-200: oklch(0.86 0.09 52);
+  --palette-orange-300: oklch(0.78 0.13 50);
+  --palette-orange-400: oklch(0.72 0.17 48);
+  --palette-orange-500: oklch(0.68 0.19 46);
+  --palette-orange-600: oklch(0.62 0.19 42);
+  --palette-orange-700: oklch(0.53 0.18 38);
+  --palette-orange-800: oklch(0.44 0.15 36);
+  --palette-orange-900: oklch(0.37 0.12 35);
+
+  --palette-gray-50: oklch(0.98 0.002 265);
+  --palette-gray-100: oklch(0.96 0.003 265);
+  --palette-gray-200: oklch(0.91 0.005 265);
+  --palette-gray-300: oklch(0.83 0.008 265);
+  --palette-gray-400: oklch(0.65 0.01 265);
+  --palette-gray-500: oklch(0.52 0.012 265);
+  --palette-gray-600: oklch(0.42 0.012 265);
+  --palette-gray-700: oklch(0.32 0.012 265);
+  --palette-gray-800: oklch(0.24 0.01 265);
+  --palette-gray-900: oklch(0.18 0.008 265);
+
+  --palette-green-100: oklch(0.94 0.05 150);
+  --palette-green-600: oklch(0.6 0.14 148);
+  --palette-green-700: oklch(0.5 0.13 148);
+
+  --palette-amber-100: oklch(0.94 0.05 85);
+  --palette-amber-600: oklch(0.72 0.15 78);
+  --palette-amber-700: oklch(0.6 0.15 75);
+
+  --palette-red-100: oklch(0.94 0.04 20);
+  --palette-red-600: oklch(0.58 0.21 25);
+  --palette-red-700: oklch(0.5 0.21 26);
+
+  --palette-blue-100: oklch(0.94 0.03 240);
+  --palette-blue-600: oklch(0.58 0.16 238);
+  --palette-blue-700: oklch(0.49 0.16 240);
+
+  /* ── Layer 2: semantic tokens — LIGHT mode ──────────────────────────── */
+  --background: var(--palette-white);
+  --foreground: var(--palette-navy-950);
+
+  --card: var(--palette-white);
+  --card-foreground: var(--palette-navy-950);
+
+  --popover: var(--palette-white);
+  --popover-foreground: var(--palette-navy-950);
+
+  /* Primary = brand orange. The high-emphasis action color across both
+     the marketing site's "Submit my request" CTA pattern and the app's
+     primary buttons. */
+  --primary: var(--palette-orange-600);
+  --primary-foreground: var(--palette-white);
+
+  /* Secondary = navy. A strong action that isn't THE primary one on a
+     given screen (e.g. "Save as draft" next to "Publish"). */
+  --secondary: var(--palette-navy-900);
+  --secondary-foreground: var(--palette-white);
+
+  --muted: var(--palette-gray-100);
+  --muted-foreground: var(--palette-gray-600);
+
+  --accent: var(--palette-orange-100);
+  --accent-foreground: var(--palette-orange-800);
+
+  --destructive: var(--palette-red-600);
+  --destructive-foreground: var(--palette-white);
+
+  --success: var(--palette-green-600);
+  --success-foreground: var(--palette-white);
+  --warning: var(--palette-amber-600);
+  --warning-foreground: var(--palette-white);
+  --info: var(--palette-blue-600);
+  --info-foreground: var(--palette-white);
+
+  --border: var(--palette-gray-200);
+  --input: var(--palette-gray-200);
+  --ring: var(--palette-orange-500);
+
+  --brand: var(--palette-orange-600);
+  --brand-foreground: var(--palette-white);
+  --navy: var(--palette-navy-900);
+  --navy-foreground: var(--palette-white);
+
+  /* A small, deliberately fixed dark surface — added for the marketing
+     site's "bold navy" CTA band (Milestone 2), which the reference
+     brand language calls out by name. Unlike --navy/--navy-foreground
+     above (a themed accent that INVERTS in dark mode — see that pair's
+     redefinition in .dark below), this stays the same navy in both
+     themes on purpose: the band is meant to read as one deliberate,
+     brand-forward moment regardless of site theme, not as a swapping
+     accent color. Used sparingly — most sections use --background or
+     --muted, never this. */
+  --inverse: var(--palette-navy-900);
+  --inverse-foreground: var(--palette-white);
+  --inverse-muted-foreground: var(--palette-navy-300);
+  --inverse-border: var(--palette-navy-700);
+
+  /* Heavily-rounded, pill-leaning radii — a deliberate visual signature
+     matching the reference brand language's search bars, buttons, and
+     nav items, not Tailwind's own (much tighter) defaults. */
+  --radius-sm-value: 0.625rem;
+  --radius-md-value: 0.875rem;
+  --radius-lg-value: 1.25rem;
+  --radius-xl-value: 1.75rem;
+
+  /* Soft, low-opacity, large-blur shadows — never a harsh drop shadow.
+     Two-layer (ambient + direct) for a more natural, less "cut-out"
+     feeling of elevation. */
+  --shadow-soft-sm-value:
+    0 1px 2px -1px oklch(0.2 0.02 265 / 0.06), 0 1px 3px 0 oklch(0.2 0.02 265 / 0.04);
+  --shadow-soft-md-value:
+    0 4px 12px -4px oklch(0.2 0.02 265 / 0.1), 0 2px 6px -2px oklch(0.2 0.02 265 / 0.06);
+  --shadow-soft-lg-value:
+    0 12px 32px -8px oklch(0.2 0.02 265 / 0.14), 0 4px 12px -4px oklch(0.2 0.02 265 / 0.08);
+
+  /* An ease-out-expo-family curve — quick to start, gentle deceleration.
+     This is what "soft animations" cashes out to concretely: every
+     Motion transition and CSS transition in the app references this one
+     curve rather than each component picking its own. */
+  --ease-soft-value: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Layer 2: semantic tokens — DARK mode ─────────────────────────────
+   next-themes toggles a `.dark` class on <html>; everything below is a
+   redefinition of the SAME custom property names above, which is what
+   lets every `bg-background` / `text-foreground` / etc. utility used
+   anywhere in the app repaint correctly with zero component-level
+   changes — the entire point of the semantic-token indirection. */
+.dark {
+  /* --inverse / --inverse-foreground / --inverse-muted-foreground /
+     --inverse-border are intentionally absent from this block — see
+     their definition above in :root for why they stay constant across
+     both themes rather than being redefined here. */
+  --background: var(--palette-navy-950);
+  --foreground: var(--palette-gray-50);
+
+  /* One step lighter than the page background, for a subtle sense of
+     elevation rather than cards visually merging into the page. */
+  --card: var(--palette-navy-900);
+  --card-foreground: var(--palette-gray-50);
+
+  --popover: var(--palette-navy-900);
+  --popover-foreground: var(--palette-gray-50);
+
+  --primary: var(--palette-orange-600);
+  --primary-foreground: var(--palette-white);
+
+  /* Inverted from light mode: a dark navy-900 "secondary" button would
+     nearly vanish against a navy-950 page background, so dark mode's
+     secondary flips to a light, high-contrast surface instead. */
+  --secondary: var(--palette-gray-100);
+  --secondary-foreground: var(--palette-navy-950);
+
+  --muted: var(--palette-navy-800);
+  --muted-foreground: var(--palette-gray-400);
+
+  --accent: var(--palette-navy-800);
+  --accent-foreground: var(--palette-orange-300);
+
+  --destructive: var(--palette-red-600);
+  --destructive-foreground: var(--palette-white);
+
+  --success: var(--palette-green-600);
+  --success-foreground: var(--palette-white);
+  --warning: var(--palette-amber-600);
+  --warning-foreground: var(--palette-navy-950);
+  --info: var(--palette-blue-600);
+  --info-foreground: var(--palette-white);
+
+  --border: var(--palette-navy-700);
+  --input: var(--palette-navy-700);
+  --ring: var(--palette-orange-500);
+
+  --brand: var(--palette-orange-600);
+  --brand-foreground: var(--palette-white);
+  --navy: var(--palette-navy-100);
+  --navy-foreground: var(--palette-navy-950);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-brand-foreground);
+  }
+
+  /* A visible, on-brand keyboard focus indicator everywhere — never
+     `outline: none` without a replacement. Applied via :focus-visible
+     specifically so mouse/touch interaction never shows a ring, only
+     actual keyboard navigation does. */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  /* Thin, unobtrusive scrollbars that still use the real token palette
+     rather than the browser's default gray — small detail, but a
+     default scrollbar is one of the most common accidental "hardcoded,
+     off-brand color" leaks in an otherwise fully-themed app. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: var(--radius-lg);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* CSS-level backstop for reduced motion, alongside Motion's own
+     useReducedMotion() hook (used for JS-driven animations elsewhere in
+     the app) — this one catches plain CSS transitions/animations that
+     hook doesn't touch. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
