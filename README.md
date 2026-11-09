@@ -61,12 +61,12 @@ build" if you're picking it up for further work).
 
 ### Milestone 1 review — findings and fixes
 
-| Finding                                                                                                                                                                                                                                                                                                                                                                                           | Raised by        | Fix                                                                                                            |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| `@typescript-eslint/explicit-function-return-type` was set to `'warn'`, but `package.json`'s lint script uses `--max-warnings=0` — any warning fails the build identically to an error. Requiring explicit return-type annotations on every React component (not the actual stated requirement, which was parameter typing) would have failed lint on nearly every component file in the codebase | Engineering      | Turned off, with the reasoning documented directly in `eslint.config.mjs`                                      |
-| Two non-null assertions in `avatar.tsx`'s `getInitials` would have tripped the `no-non-null-assertion` warn-rule under that same zero-tolerance setting                                                                                                                                                                                                                                           | Engineering      | Rewritten to avoid them via proper control-flow narrowing on local `const` bindings, not a suppression comment |
-| `PageTransition` — the single most frequently-triggered animation in the app (every navigation, not just a loading state) — never checked `useReducedMotion()`, unlike every other animated component                                                                                                                                                                                             | UX/Accessibility | Now falls back to an instant, non-animated swap when motion is reduced                                         |
-| `ThemeToggle` had no visible hover affordance for sighted mouse users — only screen readers got the full context via `aria-label`                                                                                                                                                                                                                                                                 | Product          | Added a native `title` attribute; not worth a full Tooltip primitive for one button                            |
+| Finding | Raised by | Fix |
+| --- | --- | --- |
+| `@typescript-eslint/explicit-function-return-type` was set to `'warn'`, but `package.json`'s lint script uses `--max-warnings=0` — any warning fails the build identically to an error. Requiring explicit return-type annotations on every React component (not the actual stated requirement, which was parameter typing) would have failed lint on nearly every component file in the codebase | Engineering | Turned off, with the reasoning documented directly in `eslint.config.mjs` |
+| Two non-null assertions in `avatar.tsx`'s `getInitials` would have tripped the `no-non-null-assertion` warn-rule under that same zero-tolerance setting | Engineering | Rewritten to avoid them via proper control-flow narrowing on local `const` bindings, not a suppression comment |
+| `PageTransition` — the single most frequently-triggered animation in the app (every navigation, not just a loading state) — never checked `useReducedMotion()`, unlike every other animated component | UX/Accessibility | Now falls back to an instant, non-animated swap when motion is reduced |
+| `ThemeToggle` had no visible hover affordance for sighted mouse users — only screen readers got the full context via `aria-label` | Product | Added a native `title` attribute; not worth a full Tooltip primitive for one button |
 
 **Found in the M2 session, once real `tsc`/`eslint` could actually
 run (see BUILD_PLAN.md Section 2a for full detail on each):** three
@@ -483,12 +483,12 @@ set the marker cookie described in Milestone 9's section above.
 ## Scripts
 
 ```bash
-npm run dev            # Next.js dev server with Turbopack
+npm run dev             # Next.js dev server with Turbopack
 npm run build           # production build
-npm run lint             # ESLint, zero warnings tolerated
-npm run typecheck        # tsc --noEmit
-npm run test              # Vitest
-npm run format            # Prettier, with Tailwind class sorting
+npm run lint            # ESLint, zero warnings tolerated
+npm run typecheck       # tsc --noEmit
+npm run test            # Vitest
+npm run format          # Prettier, with Tailwind class sorting
 ```
 
 ## Known gaps (deliberate, not oversights)
@@ -567,5 +567,3 @@ E2E test suite, was not chosen and remains fully open above.
 Full detail, including the exact env vars each integration reads and
 why each one degrades safely without them, is in `.env.example` and
 `BUILD_PLAN.md`'s Section 8.
- 
- 
