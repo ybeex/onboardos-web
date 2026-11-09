@@ -566,7 +566,6 @@ E2E test suite, was not chosen and remains fully open above.
 
 Full detail, including the exact env vars each integration reads and
 why each one degrades safely without them, is in `.env.example` and
-BUILD_PLAN.md's Section 8
-#   o n b o a r d o s - w e b 
+`BUILD_PLAN.md`'s Section 8.
  
  
